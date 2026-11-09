@@ -1,0 +1,36 @@
+# Run the whole website on one server (AWS EC2, any VPS):
+#   cp deploy.env.example .env   → fill in values
+#   docker compose up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shauryawada
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      POSTGRES_DB: shauryawada
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shauryawada -d shauryawada"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://shauryawada:${DB_PASSWORD}@db:5432/shauryawada
+    ports:
+      - "80:4000"
+    volumes:
+      - uploads:/app/server/uploads
+
+volumes:
+  pgdata:
+  uploads:

@@ -20,5 +20,5 @@ COPY --from=build /app/client/dist /app/client/dist
 RUN mkdir -p uploads && chown -R node:node /app
 USER node
 EXPOSE 4000
-# Apply pending migrations, then start
-CMD ["sh", "-c", "node dist/db/migrate.js && node dist/index.js"]
+# Apply migrations, run the (idempotent) seed — creates the owner from SEED_ADMIN_* only if missing — then start
+CMD ["sh", "-c", "node dist/db/migrate.js && node dist/db/seed.js && node dist/index.js"]

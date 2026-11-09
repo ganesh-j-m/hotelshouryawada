@@ -26,7 +26,8 @@ export const config = {
     .map((o) => o.trim())
     .filter(Boolean),
   siteUrl: (process.env.SITE_URL ?? 'http://localhost:5173').replace(/\/$/, ''),
-  cookieSecure: isProd || process.env.COOKIE_SECURE === 'true',
+  // Secure cookies need HTTPS. Set COOKIE_SECURE=false only for plain-http testing (e.g. http://<server-ip>)
+  cookieSecure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : isProd,
   cookieName: 'sw_admin',
   uploadDir: path.resolve(process.env.UPLOAD_DIR ?? 'uploads'),
   publicUploadBase: (process.env.PUBLIC_UPLOAD_BASE ?? '/uploads').replace(/\/$/, ''),

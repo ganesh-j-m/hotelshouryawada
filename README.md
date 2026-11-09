@@ -111,6 +111,17 @@ Migrations run automatically on start. Then create the owner once:
 ### Option C — Frontend and API on separate hosts
 Build the client with `VITE_API_URL=https://api.yourdomain` and `VITE_SITE_URL=https://www.yourdomain`, set `CLIENT_ORIGIN` on the API to the frontend URL, and serve over HTTPS. Keep both on the **same parent domain** (e.g. `www.` + `api.`) — the admin cookie is `SameSite=Strict`. Add an SPA fallback (all routes → `index.html`) on the static host and proxy `/sitemap.xml` + `/robots.txt` to the API.
 
+### Option D — AWS EC2 / any VPS (docker compose: app + Postgres on one server)
+```bash
+# on Ubuntu EC2 (open ports 22 and 80 in the security group)
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+curl -fsSL https://get.docker.com | sudo sh
+git clone https://github.com/<you>/hotel-shauryawada.git && cd hotel-shauryawada
+cp deploy.env.example .env && nano .env      # fill DB_PASSWORD, JWT_SECRET, server IP, SEED_ADMIN_*
+sudo docker compose up -d --build
+```
+Open `http://<server-ip>` and `http://<server-ip>/admin`. `COOKIE_SECURE=false` is only for plain-http testing — once you add a domain + HTTPS (e.g. Caddy or Nginx + Certbot), remove it.
+
 ### After launch
 - Submit `https://yourdomain/sitemap.xml` in Google Search Console.
 - Add a 1200×630 social image in **Website Content → Footer & SEO**.

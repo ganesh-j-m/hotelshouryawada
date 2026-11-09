@@ -38,6 +38,8 @@ export function createApp() {
           baseUri: ["'self'"],
           formAction: ["'self'"],
           frameAncestors: ["'self'"],
+          // Only force https sub-requests when the site is actually served over https
+          upgradeInsecureRequests: config.cookieSecure ? [] : null,
         },
       },
     }),
